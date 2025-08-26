@@ -22,8 +22,8 @@ jobs:
       - name: Build app (no code signing)
         run: |
           xcodebuild clean build \
-          -workspace YourApp.xcworkspace \
-          -scheme YourAppScheme \
+          -workspace NIPeekaboo.xcodeproj \
+          -scheme NIPeekaboo \
           -destination 'generic/platform=iOS' \
           CODE_SIGNING_ALLOWED=NO \
           CODE_SIGN_IDENTITY="" \
