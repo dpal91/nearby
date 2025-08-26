@@ -1,12 +1,12 @@
-name: iOS Build (Unsigned)
+name: iOS Build & Release App (Unsigned)
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'  # Triggers on version tags like v1.0.0, v2.1.3
 
 jobs:
-  build:
+  build-and-release:
     runs-on: macos-latest
 
     steps:
@@ -18,10 +18,6 @@ jobs:
         with:
           xcode-version: '16.4'
 
-      - name: List available schemes (for debugging)
-        run: |
-          xcodebuild -list -project NIPeekaboo.xcodeproj
-
       - name: Build app (no code signing)
         run: |
           xcodebuild clean build \
@@ -31,3 +27,20 @@ jobs:
           CODE_SIGNING_ALLOWED=NO \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO
+
+      - name: Find and zip .app file
+        run: |
+          mkdir -p release
+          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "NIPeekaboo.app" -type d | head -n 1)
+          echo "Found .app at: $APP_PATH"
+          cp -R "$APP_PATH" ./release/
+          cd release
+          zip -r NIPeekaboo.app.zip NIPeekaboo.app
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: release/NIPeekaboo.app.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
