@@ -18,13 +18,16 @@ jobs:
         with:
           xcode-version: '16.4'
 
+      - name: List Xcode schemes (debug)
+        run: |
+          xcodebuild -list -project NIPeekaboo.xcodeproj
 
       - name: Build app (no code signing)
         run: |
-          xcodebuild clean build \
-          -workspace project.xcworkspace \
-          -scheme NIPeekaboo \
-          -destination 'generic/platform=iOS' \
-          CODE_SIGNING_ALLOWED=NO \
-          CODE_SIGN_IDENTITY="" \
-          CODE_SIGNING_REQUIRED=NO
+            xcodebuild clean build \
+            -project NIPeekaboo.xcodeproj \
+            -scheme NIPeekaboo \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO
