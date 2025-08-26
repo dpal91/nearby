@@ -51,4 +51,3 @@ jobs:
           makeLatest: legacy
           replacesArtifacts: true
           token: ${{ secrets.TOKEN }}
-
