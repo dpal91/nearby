@@ -50,4 +50,5 @@ jobs:
           generateReleaseNotes: false
           makeLatest: legacy
           replacesArtifacts: true
-          token: ${{ secrets.TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
