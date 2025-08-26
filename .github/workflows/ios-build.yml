@@ -16,7 +16,7 @@ jobs:
       - name: Set up Xcode 15.2
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '15.2'
+          xcode-version: '16.4'
 
 
       - name: Build app (no code signing)
