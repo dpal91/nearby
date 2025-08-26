@@ -13,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Xcode 15.2
+      - name: Set up Xcode 16.4
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: '16.4'
@@ -22,7 +22,7 @@ jobs:
       - name: Build app (no code signing)
         run: |
           xcodebuild clean build \
-          -workspace NIPeekaboo.xcodeproj \
+          -workspace project.xcworkspace \
           -scheme NIPeekaboo \
           -destination 'generic/platform=iOS' \
           CODE_SIGNING_ALLOWED=NO \
