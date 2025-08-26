@@ -1,12 +1,12 @@
-name: iOS Build & Release App (Unsigned)
+name: iOS Build (Unsigned)
 
 on:
   push:
-    tags:
-      - 'v*'  # Triggers on version tags like v1.0.0, v2.1.3
+    branches:
+      - main
 
 jobs:
-  build-and-release:
+  build:
     runs-on: macos-latest
 
     steps:
@@ -17,6 +17,10 @@ jobs:
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: '16.4'
+
+      - name: List available schemes (for debugging)
+        run: |
+          xcodebuild -list -project NIPeekaboo.xcodeproj
 
       - name: Build app (no code signing)
         run: |
@@ -36,11 +40,12 @@ jobs:
           cp -R "$APP_PATH" ./release/
           cd release
           zip -r NIPeekaboo.app.zip NIPeekaboo.app
+          
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
+          tag_name: V1.0.${{ github.run_number }}
           files: release/NIPeekaboo.app.zip
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{secrets.TOKEN}}
