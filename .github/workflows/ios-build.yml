@@ -40,6 +40,9 @@ jobs:
           cp -R "$APP_PATH" ./release/
           cd release
           zip -r NIPeekaboo.app.zip NIPeekaboo.app
+
+      - name: List release directory contents
+        run: ls -l ./release
           
 
       - name: Create GitHub Release
