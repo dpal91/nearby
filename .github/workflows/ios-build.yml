@@ -43,9 +43,9 @@ jobs:
           
 
       - name: Upload to GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: ncipollo/release-action@v1
         with:
           tag_name: V1.0.${{ github.run_number }}
-          files: release/NIPeekaboo.app.zip
+          artifacts: "release/NIPeekaboo.app.zip"
         env:
           GITHUB_TOKEN: ${{secrets.TOKEN}}
