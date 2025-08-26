@@ -45,7 +45,9 @@ jobs:
       - name: Upload to GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          tag_name: V1.0.${{ github.run_number }}
-          artifacts: "release/NIPeekaboo.app.zip"
-        env:
-          GITHUB_TOKEN: ${{secrets.TOKEN}}
+          tag: V1.0.9  # or 'ci-latest' for CI builds
+          artifacts: release/NIPeekaboo.app.zip
+          generateReleaseNotes: false
+          makeLatest: legacy
+          replacesArtifacts: true
+          token: ${{secrets.TOKEN}}
