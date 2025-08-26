@@ -1,0 +1,27 @@
+name: iOS Build (Unsigned)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.2.app
+
+      - name: Build app (no code signing)
+        run: |
+          xcodebuild clean build \
+          -workspace YourApp.xcworkspace \
+          -scheme YourAppScheme \
+          -destination 'generic/platform=iOS' \
+          CODE_SIGNING_ALLOWED=NO \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO
