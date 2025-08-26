@@ -46,7 +46,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: V1.0.9  # or 'ci-latest' for CI builds
-          artifacts: release/NIPeekaboo.app.zip
+          artifacts: "release/NIPeekaboo.app.zip"
           generateReleaseNotes: false
           makeLatest: legacy
           replacesArtifacts: true
