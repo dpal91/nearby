@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -18,33 +20,79 @@ jobs:
         with:
           xcode-version: '16.4'
 
-      - name: List available schemes (for debugging)
+      - name: Archive the app
         run: |
-          xcodebuild -list -project NIPeekaboo.xcodeproj
+            xcodebuild clean archive \
+            -project NIPeekaboo.xcodeproj \
+            -scheme NIPeekaboo \
+            -destination 'generic/platform=iOS' \
+            -archivePath ${{ github.workspace }}/build/NIPeekaboo.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO
 
-      - name: Build app (no code signing)
+      - name: Export IPA
         run: |
-          xcodebuild clean build \
-          -project NIPeekaboo.xcodeproj \
-          -scheme NIPeekaboo \
-          -destination 'generic/platform=iOS' \
-          CODE_SIGNING_ALLOWED=NO \
-          CODE_SIGN_IDENTITY="" \
-          CODE_SIGNING_REQUIRED=NO
+                mkdir -p build/exportOptions
+                cat > build/exportOptions/ExportOptions.plist <<EOF
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                <plist version="1.0">
+                <dict>
+                  <key>method</key>
+                  <string>development</string>
+                  <key>signingStyle</key>
+                  <string>manual</string>
+                  <key>stripSwiftSymbols</key>
+                  <true/>
+                  <key>compileBitcode</key>
+                  <false/>
+                </dict>
+                </plist>
+                EOF
+                
+                xcodebuild -exportArchive \
+                -archivePath ${{ github.workspace }}/build/NIPeekaboo.xcarchive \
+                -exportOptionsPlist build/exportOptions/ExportOptions.plist \
+                -exportPath ${{ github.workspace }}/build/export
 
-      - name: Find and zip .app file
-        run: |
-          mkdir -p release
-          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "NIPeekaboo.app" -type d | head -n 1)
-          echo "Found .app at: $APP_PATH"
-          cp -R "$APP_PATH" ./release/
-          cd release
-          zip -r NIPeekaboo.app.zip NIPeekaboo.app
-
-      - name: List release directory contents
-        run: ls -l ./release
+      - name: Upload IPA to release
+        uses: softprops/action-gh-release@v2
+        with:
+            files: build/export/NIPeekaboo.ipa
+        env:
+            GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
 
+#
+#
+#      - name: List available schemes (for debugging)
+#        run: |
+#          xcodebuild -list -project NIPeekaboo.xcodeproj
+#
+#      - name: Build app (no code signing)
+#        run: |
+#          xcodebuild clean build \
+#          -project NIPeekaboo.xcodeproj \
+#          -scheme NIPeekaboo \
+#          -destination 'generic/platform=iOS' \
+#          CODE_SIGNING_ALLOWED=NO \
+#          CODE_SIGN_IDENTITY="" \
+#          CODE_SIGNING_REQUIRED=NO
+#
+#      - name: Find and zip .app file
+#        run: |
+#          mkdir -p release
+#          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "NIPeekaboo.app" -type d | head -n 1)
+#          echo "Found .app at: $APP_PATH"
+#          cp -R "$APP_PATH" ./release/
+#          cd release
+#          zip -r NIPeekaboo.app.zip NIPeekaboo.app
+#
+#      - name: List release directory contents
+#        run: ls -l ./release
+#
+#
 #      - name: Create GitHub Release
 #        id: create_release
 #        uses: softprops/action-gh-release@v1
@@ -54,14 +102,13 @@ jobs:
 #          body: 'Automated unsigned iOS app build'
 #        env:
 #          GITHUB_TOKEN: ${{ secrets.TOKEN }}
-
-      - name: Upload zipped app to Release
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./release/NIPeekaboo.app.zip
-          asset_name: NIPeekaboo.app.zip
-          asset_content_type: application/zip
-          TOKEN: ${{ secrets.TOKEN }}
-
-
+#
+#      - name: Upload zipped app to Release
+#        uses: actions/upload-release-asset@v1
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }}
+#          asset_path: ./release/NIPeekaboo.app.zip
+#          asset_name: NIPeekaboo.app.zip
+#          asset_content_type: application/zip
+#
+#
