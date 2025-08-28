@@ -31,35 +31,10 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO
 
-      - name: Export IPA
-        run: |
-                mkdir -p build/exportOptions
-                cat > build/exportOptions/ExportOptions.plist <<EOF
-                <?xml version="1.0" encoding="UTF-8"?>
-                <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-                <plist version="1.0">
-                <dict>
-                  <key>method</key>
-                  <string>development</string>
-                  <key>signingStyle</key>
-                  <string>manual</string>
-                  <key>stripSwiftSymbols</key>
-                  <true/>
-                  <key>compileBitcode</key>
-                  <false/>
-                </dict>
-                </plist>
-                EOF
-                
-                xcodebuild -exportArchive \
-                -archivePath ${{ github.workspace }}/build/NIPeekaboo.xcarchive \
-                -exportOptionsPlist build/exportOptions/ExportOptions.plist \
-                -exportPath ${{ github.workspace }}/build/export
-
-      - name: Upload IPA to release
+      - name: Upload .app to release
         uses: softprops/action-gh-release@v2
         with:
-            files: build/export/NIPeekaboo.ipa
+            files: build/NIPeekaboo.xcarchive/Products/Applications/NIPeekaboo.app
         env:
             GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
