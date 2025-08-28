@@ -31,12 +31,19 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO
 
-      - name: Upload .app to release
+      - name: Zip the .app bundle
+        run: |
+          cd build/NIPeekaboo.xcarchive/Products/Applications
+          zip -r NIPeekaboo.app.zip NIPeekaboo.app
+
+      - name: Upload .app.zip to release
         uses: softprops/action-gh-release@v2
         with:
-            files: build/NIPeekaboo.xcarchive/Products/Applications/NIPeekaboo.app
-            tag_name: 'build-${{ github.run_id }}'
+          files: build/NIPeekaboo.xcarchive/Products/Applications/NIPeekaboo.app.zip
+          tag_name: 'build-${{ github.run_id }}'  # or use a version tag like ${{ github.ref_name }}
+          name: Build ${{ github.run_id }}
         env:
+
             GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
 
